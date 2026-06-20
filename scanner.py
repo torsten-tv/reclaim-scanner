@@ -87,11 +87,13 @@ def analyze(df):
     if reclaimed:
         ridx = bi + 1 + int(np.argmax(after > mid))
         pulled = bool((l[ridx:] <= entry).any())
-    if price > target: status = "vorbei"
+    if price <= stop: status = "ausgestoppt"
+    elif price > target: status = "vorbei"
     elif not reclaimed: status = "DOWNTREND"
-    elif pulled and price <= entry * 1.03 and price > stop: status = "ENTRY"
-    elif pulled: status = "GEFUELLT"
-    else: status = "BEOBACHTUNG"
+    elif not pulled: status = "BEOBACHTUNG"
+    elif entry * 0.97 <= price <= entry * 1.03: status = "ENTRY"   # enge Entry-Zone, beidseitig
+    elif price > entry * 1.03: status = "GEFUELLT"                  # gefuellt, ueber Entry Richtung Ziel
+    else: status = "UNTERWASSER"                                    # gefuellt, unter Entry Richtung Stop
     dist = (price - entry) / entry * 100
     rr = (target - entry) / (entry - stop) if entry > stop else 0
     return dict(status=status, price=round(price,2), A=round(A,2), tief1=round(B,2),
@@ -125,7 +127,7 @@ def main():
                 if r: r.update(ticker=s, region=tk[s]); rows.append(r)
             except Exception: continue
         print(f"  {min(i+CHUNK,len(syms))}/{len(syms)} verarbeitet, {len(rows)} Treffer", file=sys.stderr)
-    order = {"ENTRY":0,"BEOBACHTUNG":1,"GEFUELLT":2,"DOWNTREND":3,"vorbei":4}
+    order = {"ENTRY":0,"BEOBACHTUNG":1,"GEFUELLT":2,"UNTERWASSER":3,"DOWNTREND":4,"ausgestoppt":5,"vorbei":6}
     rows.sort(key=lambda r: (order.get(r['status'],9), abs(r['dist'])))
     out = dict(rows=rows, n_scanned=len(syms))
     json.dump(out, open(BASE / "results.json", "w"))

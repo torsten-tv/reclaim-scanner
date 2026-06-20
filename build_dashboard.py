@@ -45,6 +45,7 @@ html = """<!DOCTYPE html><html lang="de"><head><meta charset="utf-8">
   .st{padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;color:#0b0d10}
   .ENTRY{background:var(--green)}.BEOBACHTUNG{background:var(--yellow)}
   .GEFUELLT{background:var(--blue);color:#fff}.DOWNTREND{background:var(--gray);color:#fff}
+  .UNTERWASSER{background:#e08a3d;color:#0b0d10}.ausgestoppt{background:#5a2a22;color:#e0a08a}
   .vorbei{background:#33384400;color:var(--mut)}
   .reg{color:var(--mut);font-size:12px}
   a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
@@ -68,12 +69,12 @@ Long-Reversal: Daily-Schluss über 50%-Mitte → Pullback-Entry → Stop = Tief 
 </tr></thead><tbody id="tb"></tbody></table></div>
 <script>
 const ROWS=__DATA__;
-const order={ENTRY:0,BEOBACHTUNG:1,GEFUELLT:2,DOWNTREND:3,vorbei:4};
+const order={ENTRY:0,BEOBACHTUNG:1,GEFUELLT:2,UNTERWASSER:3,DOWNTREND:4,ausgestoppt:5,vorbei:6};
 let flt="ENTRY", reg="ALL", sortk="dist", asc=true;
 const counts={};ROWS.forEach(r=>counts[r.status]=(counts[r.status]||0)+1);
-const labels={ENTRY:"🟢 Entry",BEOBACHTUNG:"🟡 Beobachtung",GEFUELLT:"🔵 Gefüllt",DOWNTREND:"⚪ Downtrend",vorbei:"Vorbei",ALL:"Alle"};
+const labels={ENTRY:"🟢 Entry",BEOBACHTUNG:"🟡 Beobachtung",GEFUELLT:"🔵 Gefüllt",UNTERWASSER:"🟠 Unterwasser",DOWNTREND:"⚪ Downtrend",ausgestoppt:"⛔ Ausgestoppt",vorbei:"Vorbei",ALL:"Alle"};
 const fb=document.getElementById("filters");
-["ENTRY","BEOBACHTUNG","GEFUELLT","DOWNTREND","vorbei","ALL"].forEach(k=>{
+["ENTRY","BEOBACHTUNG","GEFUELLT","UNTERWASSER","DOWNTREND","ausgestoppt","vorbei","ALL"].forEach(k=>{
   const n=k==="ALL"?ROWS.length:(counts[k]||0);
   const p=document.createElement("span");p.className="pill"+(k===flt?" on":"");
   p.innerHTML=labels[k]+" <b>"+n+"</b>";p.onclick=()=>{flt=k;[...fb.children].forEach(c=>c.classList.remove("on"));p.classList.add("on");render()};
