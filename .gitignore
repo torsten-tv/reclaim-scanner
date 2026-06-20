@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+results.json
+dashboard.html
+_site/
+.venv/
